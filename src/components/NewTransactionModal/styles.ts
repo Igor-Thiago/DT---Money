@@ -86,3 +86,33 @@ export const CloseButton = styled(Dialog.Close)`
 
 
 `;
+
+export const TransactionType = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+`;
+
+interface TransactionTypeButtonProps {
+    variant: "income" | "outcome";
+}
+
+
+export const TransactionTypeButton = styled.button<TransactionTypeButtonProps>`
+    background: ${props => props.theme["gray-700"]};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 6px;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 1rem;
+    color: ${props => props.theme["gray-300"]};
+
+    svg {
+        color: ${props => props.variant === "income" ? props.theme["green-300"] : props.theme["red-300"]};
+    }
+
+`;
