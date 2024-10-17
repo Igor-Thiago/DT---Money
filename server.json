@@ -15,6 +15,15 @@
             "category": "casa",
             "price": 2000,
             "createdAt": "2024-10-16T17:30:41.310Z"
+        },
+        {
+            "id": 3,
+            "description": "Rocketseat",
+            "type": "outcome",
+            "category": "Educação",
+            "price": 2100,
+            "createdAt": "2024-10-16T17:33:41.310Z"
         }
+        
     ]
 }
