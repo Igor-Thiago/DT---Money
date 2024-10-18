@@ -1,27 +1,10 @@
 import { ArrowCircleDown, ArrowCircleUp, CurrencyDollar } from "phosphor-react";
 import { SummaryCard, SummaryContainer } from "./styles";
-import { useContext } from "react";
-import { TransactionContext } from "../../contexts/TransactionsContexts";
 import { priceFormatter } from "../../utils/formatter";
+import { useSummary } from "../../hooks/useSummary";
 
 export function Summary() {
-    const {transactions} = useContext(TransactionContext);
-    
-    const summary = transactions.reduce(
-        (acc, transaction) => {
-
-            if(transaction.type === 'income'){
-                acc.income += transaction.price;
-                acc.total += transaction.price;
-            } else {
-                acc.outcome += transaction.price;
-                acc.total -= transaction.price;
-            }
-            return acc;
-        },
-        {income: 0, outcome: 0, total: 0});
-    //Esse método reduce serve para mudar um tipo de dado para outro, nesse caso, ele está mudando um array de objetos para um objeto com 3 propriedades
-
+   const summary = useSummary(); // Esta função usa uma espécie de hook criado por mim para simplicar o código deste componente
     return (
         <SummaryContainer>
             <SummaryCard>
