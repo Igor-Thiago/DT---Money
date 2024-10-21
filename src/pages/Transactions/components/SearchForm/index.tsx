@@ -3,6 +3,8 @@ import { SearchFormContainer } from "./styles";
 import { useForm } from "react-hook-form";
 import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import { TransactionContext } from "../../../../contexts/TransactionsContexts";
 
 //Abaixo eu defino um esquema de validação do formulário falando os campos que ele vai ter e o tipo deles
 
@@ -15,14 +17,15 @@ type SearchFormInputs = z.infer<typeof searchFormSchema>;
 
 export function SearchForm() {
 
+  const {fetchTransactions} = useContext(TransactionContext);
+
   const { register, handleSubmit, formState: { isSubmitting }} = useForm<SearchFormInputs>({
     resolver: zodResolver(searchFormSchema), // isso aplica o esquema de validação ao formulário
   });
   
   //função que vai ser chamada quando o formulário for submetido 
   async function handleSearchTransaction(dados: SearchFormInputs){
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log(dados);
+    await fetchTransactions(dados.query)
   }
 
 
