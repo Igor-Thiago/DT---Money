@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { createContext} from 'use-context-selector'
 import { api } from "../lib/axios";
 interface Transaction {
     id: number;
@@ -31,24 +32,24 @@ export const TransactionContext = createContext({} as TransactionContextType);
 export function TransactionsProvider({children}: TransactionsProviderProps){
     const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-    async function fetchTransactions(query?: string){
+    const fetchTransactions = useCallback(async(query?: string) =>{
 
-    // A função fetchTransactions é uma função assíncrona que faz uma requisição à API localizada em 'http://localhost:3000/transactions'.
-    // Ela usa o método GET e, caso seja passado um parâmetro query, ele é enviado como parâmetro da requisição.
-    // O resultado da requisição é armazenado na variável response e o seu conteúdo é armazenado no estado transactions.
-    // A biblioteca axios é utilizada para fazer a requisição. Ela é importada do arquivo src/lib/axios.ts.
+        // A função fetchTransactions é uma função assíncrona que faz uma requisição à API localizada em 'http://localhost:3000/transactions'.
+        // Ela usa o método GET e, caso seja passado um parâmetro query, ele é enviado como parâmetro da requisição.
+        // O resultado da requisição é armazenado na variável response e o seu conteúdo é armazenado no estado transactions.
+        // A biblioteca axios é utilizada para fazer a requisição. Ela é importada do arquivo src/lib/axios.ts.
+    
+            const response = await api.get('/transactions', {
+                params: {
+                    _sort: 'createdAt',
+                    _order: 'desc',
+                    q: query,
+                }
+            });
+            setTransactions(response.data);
+        }, []);
 
-        const response = await api.get('/transactions', {
-            params: {
-                _sort: 'createdAt',
-                _order: 'desc',
-                q: query,
-            }
-        });
-        setTransactions(response.data);
-    }
-
-    async function createTransaction(data: CreateTransactionData){
+    const createTransaction = useCallback(async (data: CreateTransactionData) => {
         const {category, description, price, type } = data;
 
         
@@ -63,14 +64,14 @@ export function TransactionsProvider({children}: TransactionsProviderProps){
         });
         //Aqui é feita a atualização do estado transactions, adicionando a nova transação no início do array.
         setTransactions(state =>[response.data, ...state]);
-    }
+    }, []); 
 
     //Para o método fetch acima(serve para fazer o teste com a API) não executar toda vez que a página for renderizada, usamos o useEffect abaixo
     //E ao passar o segundo parâmetro como um array vazio, ele só será executado uma única vez
 
     useEffect(() => {
         fetchTransactions();
-    }, [])
+    }, [fetchTransactions])
     return (
         <TransactionContext.Provider value={{transactions, fetchTransactions,createTransaction}}>
             {children}
