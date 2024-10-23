@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import { api } from "../lib/axios";
 
 interface Transaction {
     id: number;
@@ -26,19 +27,16 @@ export function TransactionsProvider({children}: TransactionsProviderProps){
     async function fetchTransactions(query?: string){
 
     // A função fetchTransactions é uma função assíncrona que faz uma requisição à API localizada em 'http://localhost:3000/transactions'.
-    // Ela usa o método fetch para buscar os dados das transações no servidor. 
-    // O 'await' garante que o código aguarde a resposta da API antes de prosseguir.
-    // Depois de receber a resposta, ela converte a resposta em formato JSON com o método response.json().
-    // Finalmente, os dados são exibidos no console através do console.log(data).
+    // Ela usa o método GET e, caso seja passado um parâmetro query, ele é enviado como parâmetro da requisição.
+    // O resultado da requisição é armazenado na variável response e o seu conteúdo é armazenado no estado transactions.
+    // A biblioteca axios é utilizada para fazer a requisição. Ela é importada do arquivo src/lib/axios.ts.
 
-        const url = new URL('http://localhost:3000/transactions');
-        if(query){
-            url.searchParams.append('q', query);
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-        setTransactions(data);
+        const response = await api.get('/transactions', {
+            params: {
+                q: query,
+            }
+        });
+        setTransactions(response.data);
     }
 
     //Para o método fetch acima(serve para fazer o teste com a API) não executar toda vez que a página for renderizada, usamos o useEffect abaixo
