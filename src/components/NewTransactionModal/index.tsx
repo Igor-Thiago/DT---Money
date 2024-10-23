@@ -4,6 +4,8 @@ import { ArrowCircleDown, ArrowCircleUp, X } from "phosphor-react";
 import * as z from 'zod';
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import { TransactionContext } from "../../contexts/TransactionsContexts";
 
 const newTransactionFormSchema = z.object({
     description: z.string(),
@@ -16,14 +18,30 @@ type NewTransactionFormInputs = z.infer<typeof newTransactionFormSchema>;
 
 export function NewTransactionModal() {
 
-    const { register, handleSubmit, formState: {isSubmitting}, control} = useForm<NewTransactionFormInputs>({
+    const {createTransaction} = useContext(TransactionContext);
+
+    const { register, handleSubmit, formState: {isSubmitting}, control, reset} = useForm<NewTransactionFormInputs>({
         resolver: zodResolver(newTransactionFormSchema),
         defaultValues: {type: 'income'}
     });
 
     async function handleCreateNewTransaction(data: NewTransactionFormInputs) {
+
+        // Essa constante é utilizada para desestruturar os dados da transação que foram passados como parâmetros.
+        const {category, description, price, type } = data;
+
         await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log(data);
+
+        await createTransaction({
+            category,
+            description,
+            price,
+            type
+        });
+        
+     
+        reset();
+
     }
     return (
         <Dialog.Portal>

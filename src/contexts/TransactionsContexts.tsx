@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 import { api } from "../lib/axios";
-
 interface Transaction {
     id: number;
     type: 'income' | 'outcome';
@@ -13,10 +12,18 @@ interface Transaction {
 interface TransactionContextType{
     transactions: Transaction[];
     fetchTransactions: (query?: string) => Promise<void>;
+    createTransaction: (data: CreateTransactionData) => Promise<void>;
 }
 
 interface TransactionsProviderProps{
     children: React.ReactNode;
+}
+
+interface CreateTransactionData{
+    category: string;
+    description: string;
+    price: number;
+    type: 'income' | 'outcome';
 }
 
 export const TransactionContext = createContext({} as TransactionContextType);
@@ -33,10 +40,29 @@ export function TransactionsProvider({children}: TransactionsProviderProps){
 
         const response = await api.get('/transactions', {
             params: {
+                _sort: 'createdAt',
+                _order: 'desc',
                 q: query,
             }
         });
         setTransactions(response.data);
+    }
+
+    async function createTransaction(data: CreateTransactionData){
+        const {category, description, price, type } = data;
+
+        
+        //Aqui é feita a requisição POST para a API, passando os dados da transação como parâmetros.
+        // O método post é utilizado para inserir uma nova transação no banco de dados.
+        const response = await api.post('/transactions', {
+            category,
+            description,
+            price,
+            type,
+            createdAt: new Date(),
+        });
+        //Aqui é feita a atualização do estado transactions, adicionando a nova transação no início do array.
+        setTransactions(state =>[response.data, ...state]);
     }
 
     //Para o método fetch acima(serve para fazer o teste com a API) não executar toda vez que a página for renderizada, usamos o useEffect abaixo
@@ -46,7 +72,7 @@ export function TransactionsProvider({children}: TransactionsProviderProps){
         fetchTransactions();
     }, [])
     return (
-        <TransactionContext.Provider value={{transactions, fetchTransactions}}>
+        <TransactionContext.Provider value={{transactions, fetchTransactions,createTransaction}}>
             {children}
         </TransactionContext.Provider>
     )
